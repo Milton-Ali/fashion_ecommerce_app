@@ -1,3 +1,4 @@
+import 'package:fashion_ecommerce_app/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
@@ -7,7 +8,7 @@ class AppTheme {
       brightness: Brightness.light,
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.green,
+        seedColor: AppColors.primary,
         brightness: Brightness.light,
       ),
     );
@@ -19,7 +20,7 @@ class AppTheme {
       brightness: Brightness.dark,
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.green,
+        seedColor: AppColors.primary,
         brightness: Brightness.dark,
       ),
     );
