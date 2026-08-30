@@ -30,7 +30,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {
-                  _pageController.jumpToPage(2);
+                  _pageController.jumpToPage(onboardingData.length - 1);
                 },
                 child: const Text('Skip'),
               ),
@@ -68,7 +68,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               currentPage: currentPage,
               pageCount: onboardingData.length,
             ),
-            SizedBox(height: 10),
+            SizedBox(height: AppSizes.lg),
             SizedBox(
               height: 30,
               width: 140,
