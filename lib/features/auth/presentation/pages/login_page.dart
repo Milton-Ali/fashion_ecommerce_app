@@ -2,6 +2,7 @@ import 'package:fashion_ecommerce_app/core/constants/colors.dart';
 import 'package:fashion_ecommerce_app/core/constants/sizes.dart';
 import 'package:fashion_ecommerce_app/core/constants/text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,10 +12,63 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isPasswordHidden = true;
   bool _isLoading = false;
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  //login
+  Future<void> _login() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        await _auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        setState(() {
+          _isLoading = false;
+        });
+      } on FirebaseAuthException catch (e) {
+        String message = 'Something went wrong';
+        switch (e.code) {
+          case 'invalid-credential':
+            message = 'Invalid email or password';
+            break;
+
+          case 'user-not-found':
+            message = 'No user found with this email';
+            break;
+
+          case 'wrong-password':
+            message = 'Incorrect password';
+            break;
+
+          default:
+            message = 'Login failed. Please try again';
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(message)));
+        }
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  //logOut
+  Future<void> _logOut() async {
+    _auth.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLandscape =
@@ -60,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                             SizedBox(height: AppSizes.md),
                             //Please enter your email
                             TextFormField(
+                              controller: _emailController,
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return 'Please enter your email';
@@ -175,13 +230,7 @@ class _LoginPageState extends State<LoginPage> {
                               width: double.infinity,
                               height: 50,
                               child: ElevatedButton(
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                  }
-                                },
+                                onPressed: _login,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
                                   shape: RoundedRectangleBorder(

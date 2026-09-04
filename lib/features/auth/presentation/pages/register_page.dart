@@ -2,6 +2,7 @@ import 'package:fashion_ecommerce_app/core/constants/colors.dart';
 import 'package:fashion_ecommerce_app/core/constants/sizes.dart';
 import 'package:fashion_ecommerce_app/core/constants/text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -13,10 +14,20 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   bool _isPasswordHidden = true;
   bool _isLoading = false;
+  final TextEditingController _emailControal = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  @override
+  void dispose() {
+    _emailControal.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLandscape =
@@ -106,6 +117,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             SizedBox(height: AppSizes.md),
                             TextFormField(
+                              controller: _emailControal,
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return 'Please enter your email';
@@ -283,11 +295,64 @@ class _RegisterPageState extends State<RegisterPage> {
                               width: double.infinity,
                               height: 50,
                               child: ElevatedButton(
-                                onPressed: () {
+                                onPressed: () async {
+                                  if (_isLoading) return;
                                   if (_formKey.currentState!.validate()) {
+                                    final email = _emailControal.text.trim();
+                                    final password = _passwordController.text
+                                        .trim();
                                     setState(() {
                                       _isLoading = true;
                                     });
+                                    try {
+                                      await _auth
+                                          .createUserWithEmailAndPassword(
+                                            email: email,
+                                            password: password,
+                                          );
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Account created successfully',
+                                          ),
+                                        ),
+                                      );
+                                    } on FirebaseAuthException catch (e) {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+
+                                      String errorMessage;
+                                      switch (e.code) {
+                                        case 'email-already-in-use':
+                                          errorMessage =
+                                              'This email is already registered';
+                                          break;
+
+                                        case 'weak-password':
+                                          errorMessage = 'Password is too weak';
+                                          break;
+
+                                        case 'invalid-email':
+                                          errorMessage =
+                                              'Invalid email address';
+                                          break;
+
+                                        default:
+                                          errorMessage = 'Registration failed';
+                                      }
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(content: Text(errorMessage)),
+                                      );
+                                    }
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(

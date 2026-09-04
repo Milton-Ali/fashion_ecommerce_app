@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "527466144398",
+    "project_id": "fashion-ecommerce-app-b0607",
+    "storage_bucket": "fashion-ecommerce-app-b0607.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527466144398:android:10ce7d281c47d4eb611fdf",
+        "android_client_info": {
+          "package_name": "com.example.fashion_ecommerce_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlxv3QwkrkWWc86uMrwVB-ZYIEhC4bdl8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
